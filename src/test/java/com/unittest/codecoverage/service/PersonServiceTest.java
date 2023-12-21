@@ -3,11 +3,12 @@ package com.unittest.codecoverage.service;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
+import com.unittest.codecoverage.models.validators.PersonValidator;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +30,7 @@ public class PersonServiceTest {
 	PersonService service = new PersonServiceImpl();
 	@Mock
 	PersonRepository repository;
+
 	
 	@Test
 	public void testInsert_shouldInsertPersonWithSuccessWhenAllPersonsInfoIsFilled() {
@@ -99,17 +101,31 @@ public class PersonServiceTest {
 			.hasMessage(expectedMessage);
 	}
 
-	@Test
-	public void testDelete_shouldThrowPersonExceptionWhenNameIsRequiredButNotProvided() {
-		// Act & Assert
-		assertThatThrownBy(() -> service.delete(null))
-				.isInstanceOf(PersonException.class)
-				.hasMessageContaining("Name is required");
 
-		assertThatThrownBy(() -> service.delete(""))
-				.isInstanceOf(PersonException.class)
-				.hasMessageContaining("Name is required");
+	@Test
+	public void testUpdate_shouldUpdatePersonWithSuccessWhenAllPersonsInfoIsFilled() {
+		Person person = new Person();
+		person.setName("Yasi");
+		person.setAge(22);
+		person.setGender(Gender.F);
+		service.update(person);
+		verify(repository).update(person);
 	}
 
+	@Test
+	public void testDelete_shouldCallRepositoryDeleteWhenNameIsValid() throws NoSuchFieldException, IllegalAccessException {
+		String validName = "Goli Kadkhodei";
+		PersonValidator validator = mock(PersonValidator.class);
+		when(validator.requiredName(validName)).thenReturn(false);
+
+		Field validatorField = PersonServiceImpl.class.getDeclaredField("validator");
+		validatorField.setAccessible(true);
+		validatorField.set(service, validator);
+
+		service.delete(validName);
+
+		verify(validator).requiredName(validName);
+		verify(repository).delete(validName);
+	}
 
 }
