@@ -7,7 +7,6 @@ import static org.assertj.core.api.Assertions.*;
 
 public class PersonTest {
 
-
     @Test
     public void testGetName_shouldReturnDefaultValue() {
         Person person = new Person();
