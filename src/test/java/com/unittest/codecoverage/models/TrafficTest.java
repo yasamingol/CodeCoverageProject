@@ -1,7 +1,5 @@
-package com.unittest.codecoverage.validators;
+package com.unittest.codecoverage.models;
 
-import com.unittest.codecoverage.models.Traffic;
-import com.unittest.codecoverage.models.TrafficLigth;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
 
